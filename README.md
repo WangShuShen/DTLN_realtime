@@ -21,7 +21,9 @@ python real_time_dtln_audio.py --list devices
 python inference_realtime.py -i input_device_id -o output_device_id
 ```
 4.2設定Ubuntu內建的輸入/輸出裝置
+
 輸入設定路徑：Settings -> Sound -> Output -> Output Device
+
 輸出設定路徑：Settings -> Sound -> Input -> Input Device
 ```
 python inference_realtime.py
