@@ -5,6 +5,7 @@ import tflite_runtime.interpreter as tflite
 import threading
 from scipy.signal import resample
 import argparse
+import soundfile as sf
 
 
 def int_or_str(text):
@@ -81,6 +82,7 @@ class EnhancedRecorder:
                            samplerate=fs_target, blocksize=block_shift,
                            dtype=np.float32, latency=args.latency,
                            channels=1, callback=self.callback)
+        self.audio_data = []  # 用於存儲所有音頻數據的列表
 
     def callback(self, indata, outdata, frames, time, status):
 
@@ -141,6 +143,12 @@ class EnhancedRecorder:
             padding = np.zeros((outdata.shape[0] - enhanced_audio.shape[0], 1))
             enhanced_audio = np.vstack((enhanced_audio, padding))
         outdata[:] = enhanced_audio
+        self.audio_data.append(enhanced_audio.copy())
+
+    def save_audio(self, filename="output.wav"):
+        audio_to_save = np.concatenate(self.audio_data, axis=0)
+        sf.write(filename, audio_to_save, fs_target)
+        print(f"Enhanced audio saved to {filename}")
 
     def start_recording(self):
         self.recording = True
@@ -152,6 +160,7 @@ class EnhancedRecorder:
         self.recording = False
         self.playing = False
         self.p.stop()
+        self.save_audio()  # 在這裡調用保存音頻的方法
         print("Recording and enhancing stopped.")
 
     def close(self):
